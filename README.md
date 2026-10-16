@@ -258,6 +258,26 @@ clearing, policy gates and exports.
 
 ## Five-minute presenter path
 
+### Automated explanation
+
+Choose **Automated demo** in the main navigation for a presenter-led animated
+walkthrough with no timer or automatic advancement. Eight text stages follow context, finite choices,
+Microsoft Decision-1 inference, option probabilities, application gates and
+consultant confirmation, then connect the pattern to all three scenarios and
+evaluation. Process nodes, choice cards and animated score bars illustrate the
+flow. Previous/Next and Restart controls sit at the top; each step stays visible
+until you navigate. The compact layout targets laptop screens without scrolling.
+Escape or Close exits; reopening starts at the first step. Reduced-motion
+preferences disable decorative animation.
+
+This is **illustrative playback**, not live or recorded Foundry inference. Its
+example scores come from the existing local simulator, not Decision-1, and are
+labelled accordingly. It makes no inference calls, incurs no inference usage,
+and does not change workspace inputs, results, scenario, source or view. Model
+value is explained as structured judgment and reviewable numerical output, not
+measured ROI or permission to bypass policy. Close the walkthrough and run a
+Foundry live example to inspect actual model output in Technical view.
+
 Use the **Experience / Technical** toggle in the workspace bar to switch views
 without changing inputs, review threshold, scenario, or the current result.
 Experience is the default presentation. Technical replaces the hero and visual

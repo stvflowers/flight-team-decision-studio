@@ -9,20 +9,21 @@ import {
   presets, scenarios, simulate, type DecisionResult, type Inputs, type ScenarioId,
 } from './decision';
 import { isRecord, runFoundry, shortlistGate, type DecisionExchange, type FoundryConfig } from './foundry';
+import { AutomatedDemo } from './AutomatedDemo';
 
 const icons = { triage: Route, shortlist: Plane, readiness: ShieldCheck };
 const money = (value: number) => new Intl.NumberFormat('en-AU', {
   style: 'currency', currency: 'AUD', maximumFractionDigits: 0,
 }).format(value);
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
-type ModalKind = 'guide' | 'integration' | 'payload' | null;
+type ModalKind = 'guide' | 'integration' | 'payload' | 'automated' | null;
 
 function JsonPreview({ label, value }: { label: string; value: unknown }) {
   return <pre tabIndex={0} aria-label={label}>{JSON.stringify(value, (_key, entry: unknown) =>
     typeof entry === 'number' && !Number.isFinite(entry) ? 'Invalid number' : entry, 2)}</pre>;
 }
 
-function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+function Modal({ title, children, onClose, wide = false }: { title: string; children: ReactNode; onClose: () => void; wide?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
@@ -33,7 +34,7 @@ function Modal({ title, children, onClose }: { title: string; children: ReactNod
       if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus();
     };
   }, []);
-  return <dialog ref={ref} className="modal" onCancel={onClose} onKeyDown={(event) => {
+  return <dialog ref={ref} className={`modal${wide ? ' modal-wide' : ''}`} onCancel={onClose} onKeyDown={(event) => {
     if (event.key === 'Escape') { event.preventDefault(); onClose(); }
   }} aria-labelledby="modal-title">
     <div className="modal-heading"><h2 id="modal-title">{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close dialog"><X size={20} /></button></div>
@@ -163,6 +164,7 @@ export function App() {
       </a>
       <nav className="site-navigation" aria-label="Main navigation">
         <a href="#workspace">Decision studio</a>
+        <button onClick={() => setModal('automated')}><Play size={17} />Automated demo</button>
         <button onClick={() => setModal('guide')}><CircleHelp size={17} />Presenter guide</button>
         <button onClick={() => setModal('integration')}><Unplug size={17} />Data & integration</button>
       </nav>
@@ -369,7 +371,8 @@ export function App() {
       </main>
     </div>
 
-    {modal && <Modal title={modal === 'guide' ? 'Your five-minute walkthrough' : modal === 'integration' ? 'An honest model boundary' : 'Inside the decision'} onClose={() => setModal(null)}>
+    {modal && <Modal wide={modal === 'automated'} title={modal === 'automated' ? 'How decision models create value' : modal === 'guide' ? 'Your five-minute walkthrough' : modal === 'integration' ? 'An honest model boundary' : 'Inside the decision'} onClose={() => setModal(null)}>
+      {modal === 'automated' && <AutomatedDemo />}
       {modal === 'guide' && <div className="guide-content">
         <p className="modal-intro">Choose Foundry live for real Decision-1 inference or Local simulation for deterministic comparisons. All travel data and policies remain synthetic.</p>
         <ol className="guide-steps">
