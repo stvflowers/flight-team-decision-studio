@@ -27,13 +27,12 @@ automated booking or routing. Live inference may incur Azure usage charges.
 
 ## Plan first
 
-### Customer and model understanding
+### Use-case and model understanding
 
-Research context: the original customer reference was interpreted as Flight Centre Travel Group (FCTG). Its public
-brand portfolio covers mass-market leisure, luxury, and online travel; FCM serves
-large corporate customers. The demo therefore illustrates both consultant
-productivity and corporate travel controls without claiming access to customer
-requirements, internal policies, or operational data.
+Flight Team is a fictional travel team supporting leisure and corporate travel.
+The demo illustrates consultant productivity and corporate travel controls
+without claiming access to any real organization's requirements, internal
+policies, or operational data.
 
 Microsoft-Decision-1 makes bounded, typed decisions: classification, selection
 among candidates, ordered scores, and gates. It returns numerical decisions,
@@ -48,21 +47,21 @@ source of live fares, availability, visa advice, or travel safety advice.
 | Trip shortlist | Three fictional itineraries; budget, arrival deadline, flexibility preference | Help consultants compare an existing shortlist | No eligible option or close scores require review; never books |
 | Booking readiness | Fictional fare and corporate policy checks; ready, manager approval, review | Highlight policy exceptions before booking | Exceptions are never cleared by a high score |
 
-These are hypotheses for a customer conversation, not confirmed FCTG initiatives.
+These are illustrative use-case hypotheses, not confirmed customer initiatives.
 They demonstrate finite decision spaces rather than free-form generation.
 
 ### Experience and implementation sequence
 
-1. Research capabilities and customer context; select bounded scenarios.
+1. Research model capabilities and generic travel workflows; select bounded scenarios.
 2. Build a single responsive studio: scenario selection, editable context,
    candidate scores, a review threshold, and structured input/output inspection.
 3. Validate deterministic rules, review boundaries, errors, and desktop UX.
 4. Connect the existing Foundry deployment with server-side Azure CLI / Entra ID
    authentication (approved and implemented on 16 October 2026).
 
-Design: the supplied travel-site reference informs a red horizontal header,
-clean white and light-grey surfaces, rounded cards and prominent actions.
-Flight Team is a generic identity, not a recreation of that company's branding.
+Design: a red horizontal header, clean white and light-grey surfaces, rounded
+cards and prominent actions create a straightforward travel-workspace interface.
+Flight Team is a fictional identity, not a recreation of any company's branding.
 No logos, proprietary fonts, marketing copy or imagery are copied. The studio is
 light-only regardless of system preferences or URL theme parameters. Desktop is
 the presentation target; existing responsive styles are retained, but mobile is
@@ -71,7 +70,43 @@ analytics, or CDNs. Model names appear only as technical integration context.
 
 ## Run locally
 
-Requires Node.js 22.12+ (or a supported newer LTS), npm and Azure CLI.
+### Foundry live prerequisites
+
+The repository does **not** provision Azure resources or deploy a model. Before
+using **Foundry live**, prepare the following:
+
+| Requirement | What to provide or verify |
+| --- | --- |
+| Azure subscription and Foundry resource | An existing resource in a region where Microsoft-Decision-1 is available, with billing and sufficient inference quota/capacity. |
+| Model deployment | An active **Microsoft-Decision-1** deployment on that resource. Copy its exact deployment name from Foundry; a model catalog entry alone is not a deployment. A chat model or agent deployment is not interchangeable. |
+| Supported endpoint | The resource's complete `https://<resource>.services.ai.azure.com/providers/microsoft/v1/systemone` inference URL. This adapter accepts this Azure public-cloud host and route only, with no query string, credentials, explicit port or trailing slash. |
+| Entra ID identity | An Azure CLI session for the intended tenant and a user with resource-level inference permissions, such as **Cognitive Services User**. Permission to view a subscription or manage deployments does not by itself verify inference access. |
+| Network access | The local server must be able to resolve and reach the configured resource over HTTPS, and Azure CLI must be able to reach Entra ID for authentication. If resource access is restricted, use approved networking such as the required VPN/private connectivity and DNS. Do not disable network restrictions or bypass organizational policy. |
+| Local runtime | Node.js 22.12+ (or a supported newer LTS), npm, and Azure CLI available to the process running Vite. `npm ci` installs the project's Azure Identity SDK; no global SDK install is required. |
+| Server configuration | A root `.env` containing `FOUNDRY_ENDPOINT` and `FOUNDRY_DEPLOYMENT`; preferably set `AZURE_SUBSCRIPTION_ID` to pin token acquisition. See the examples below. No API key, client secret, stored token or separate app registration is required for this CLI-authenticated local demo. |
+
+The live API must support the documented Decision-1 **choice** contract: a
+`model`, `state`, and named `questions` request, and a typed answer containing
+the chosen option and per-option probabilities. Choice questions require
+**2-255 options**. The application skips inference and requests human review
+when fewer than two eligible itineraries remain; it does not invent a model
+probability. See [Foundry contract and safeguards](#foundry-contract-and-safeguards)
+for response validation, timeouts and application-owned policy gates.
+
+Model availability, deployment setup and current service requirements are
+documented in [Microsoft Learn: Deploy and use Microsoft-Decision-1](https://learn.microsoft.com/azure/foundry/foundry-models/how-to/use-foundry-models-microsoft-decision).
+If a prerequisite is missing, have the resource owner resolve it; this app does
+not deploy resources, assign permissions, or alter Azure account/network settings.
+
+**Not required for local simulation or automated tests:** an Azure resource,
+model deployment, Azure CLI sign-in or paid inference access. Those paths use
+local rules or mocked responses. Live mode is the default, so select
+**Local simulation** explicitly for an offline walkthrough.
+
+### Install and start
+
+Requires Node.js 22.12+ (or a supported newer LTS) and npm; Azure CLI is required
+only for live inference.
 Foundry live uses the identity already signed into Azure CLI with access to the
 configured resource (for example, Cognitive Services User at the resource scope).
 If sign-in is needed, run `az login` yourself for the intended tenant. The app
@@ -333,11 +368,8 @@ access tokens, keys, private certificates, real traveller data or customer recor
 
 ## Sources
 
-Reviewed 16 October 2026. Customer facts and model capabilities are separate from
-the synthetic assumptions above. No performance or ROI claims are made.
+Reviewed 16 October 2026. These sources document model capabilities; the travel
+scenarios above are synthetic assumptions. No performance or ROI claims are made.
 
 - [Microsoft: Microsoft-Decision-1 introduction](https://commandline.microsoft.com/microsoft-decision-1-model-foundry/)
 - [Microsoft Learn: Deploy and use Microsoft-Decision-1](https://learn.microsoft.com/azure/foundry/foundry-models/how-to/use-foundry-models-microsoft-decision)
-- [Flight Centre Travel Group: Brands](https://www.fctgl.com/brands)
-- [FCM: Corporate travel brand context, 18 November 2024](https://www.fcmtravel.com/en-us/travel-hub/fcm-becomes-fctg-largest-global-brand)
-- [User-supplied visual reference](https://www.flightcentre.com.au/) (layout cues only; not used as an asset source)
